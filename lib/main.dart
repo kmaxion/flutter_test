@@ -51,143 +51,71 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    initSpeechState();
+
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Speech to Text Example'),
-        ),
-        body: Column(children: [
-          Center(
-            child: Text(
-              'Speech recognition available',
-              style: TextStyle(fontSize: 22.0),
-            ),
-          ),
-          Container(
-            child: Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    FlatButton(
-                      child: Text('Initialize'),
-                      onPressed: _hasSpeech ? null : initSpeechState,
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    DropdownButton(
-                      onChanged: (selectedVal) => _switchLang(selectedVal),
-                      value: _currentLocaleId,
-                      items: _localeNames
-                          .map(
-                            (localeName) => DropdownMenuItem(
-                              value: localeName.localeId,
-                              child: Text(localeName.name),
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 4,
-            child: Column(
-              children: <Widget>[
-                Expanded(
-                  child: Column(
+        body: SafeArea(
+          child: Column(children: [
+            Container(
+              child: Column(
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.all(10),
-                        color: Theme.of(context).selectedRowColor,
-                        child: Center(
-                          child: AnimatedOpacity(
-                            opacity: lastWords == "" ? 0 : 1,
-                            duration: Duration(milliseconds: 200),
-                            child: Text(lastWords),
-                          ),
-                        ),
+                      DropdownButton(
+                        onChanged: (selectedVal) => _switchLang(selectedVal),
+                        value: _currentLocaleId,
+                        items: _localeNames
+                            .map(
+                              (localeName) => DropdownMenuItem(
+                                value: localeName.localeId,
+                                child: Text(localeName.name),
+                              ),
+                            )
+                            .toList(),
                       ),
-                      Container(
-                        child: GestureDetector(
-                          onTapDown: (TapDownDetails d) {
-                            if (_hasSpeech && !speech.isListening) {
-                              startListening();
-                            }
-                            setState(() {
-                              _bigger = true;
-                              _color = Colors.red;
-                            });
-                          },
-                          onTapUp: (TapUpDetails d) {
-                            if (speech.isListening) {
-                              stopListening();
-                            }
-                            setState(() {
-                              _bigger = false;
-                              _color = Colors.teal;
-                            });
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget> 
-                            [
-                              AnimatedContainer(
-                                height: _bigger ? 150 : 100,
-                                width: _bigger ? 150 : 100,
-                                duration: Duration(milliseconds: 400),
-                                decoration: new BoxDecoration(
-                                  color: _color,
-                                  shape: BoxShape.circle
-                                )
-                              )
-                            ]
-                          )
-                        )
-                      )
                     ],
-                  ),
-                ),
-              ],
+                  )
+                ],
+              ),
             ),
+            Container(
+              alignment: Alignment.bottomCenter,
+              child: Text(lastWords)
+            )
+          ]),
+        ),
+        bottomNavigationBar: BottomAppBar(
+          child: Container(height: 50.0,),
+        ),
+        floatingActionButton: GestureDetector(
+          onTapDown: (TapDownDetails d) {
+            if (_hasSpeech && !speech.isListening) {
+              startListening();
+            }
+            setState(() {
+              _bigger = true;
+              _color = Colors.red;
+            });
+          },
+          onTapUp: (TapUpDetails d) {
+            if (speech.isListening) {
+              stopListening();
+            }
+            setState(() {
+              _bigger = false;
+              _color = Colors.teal;
+            });
+          },
+          child: FloatingActionButton(
+            onPressed: () => setState(() {
+            }),
+            tooltip: 'Start',
+            child: Icon(Icons.mic),
           ),
-          Expanded(
-            flex: 1,
-            child: Column(
-              children: <Widget>[
-                Center(
-                  child: Text(
-                    'Error Status',
-                    style: TextStyle(fontSize: 22.0),
-                  ),
-                ),
-                Center(
-                  child: Text(lastError),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            color: Theme.of(context).backgroundColor,
-            child: Center(
-              child: speech.isListening
-                  ? Text(
-                      "I'm listening...",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    )
-                  : Text(
-                      'Not listening',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-            ),
-          ),
-        ]),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       ),
     );
   }
